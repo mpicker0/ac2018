@@ -10,10 +10,8 @@ main = do
   -- let fileLines = lines l
   -- let mappedLines = map(\l -> read l :: Integer) fileLines
   -- print mappedLines
-  l <- intsFromFile "test/data/numbers.txt"
-  print(map(+1) l)
+  l <- stringsFromFile "test/data/numbers.txt"
   print l
-  print (sum l)
 
 
 -- main = putStrLn "Test something"

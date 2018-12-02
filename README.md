@@ -32,8 +32,21 @@ cabal update && cabal install hspec
 Run all tests with
 
 ```bash
-runhaskell -isrc -itest test/Spec.hs
+scripts/tests.sh
 ```
+
+Run a group of tests or an individual test by specifying the path in the
+hierarchy, for example:
+
+```bash
+# all tests for AC.Dec01
+scripts/tests.sh -m AC.Dec01
+
+# an individual test
+scripts/tests.sh -m "AC.Dec01/part2/finds the result for example 2"
+```
+
+Leave out individual
 
 ## Running the exercises
 

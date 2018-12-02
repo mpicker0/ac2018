@@ -1,7 +1,6 @@
 module AC.Dec01Spec (spec) where
 
 import Test.Hspec
-import Control.Exception (evaluate)
 import AC.Dec01
 
 spec :: Spec
