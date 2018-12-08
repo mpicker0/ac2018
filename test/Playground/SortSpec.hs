@@ -12,4 +12,5 @@ spec = do
     let expectedOutputBySnd = [(1, "a"), (3, "b"), (2, "c")]
 
     it "lets me sort by a particular key" $ do
+      -- also see maximumBy in ListSpec
       sortBy (comparing snd) input `shouldBe` expectedOutputBySnd

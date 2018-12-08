@@ -9,6 +9,8 @@ module AC.Dec04
   , processObservations
   , mostMinutesAsleep
   , mostFrequentMinuteAsleep
+  , minuteTotals
+  , mostFrequentMinuteEntry
   ) where
 
 import System.Environment
@@ -16,6 +18,7 @@ import Helpers
 import Control.Arrow
 import Data.List
 import Data.Map (Map, fromListWith, toList, lookup)
+import qualified Data.Map as M (map)
 import Data.Maybe (fromJust)
 import Data.Ord (comparing)
 import Text.Regex.Posix
@@ -45,7 +48,7 @@ part1 observations =
   in (fromJust mostFrequentMinute) * heaviestSleeper
 
 -- Return the ID of the guard who was asleep the most
-mostMinutesAsleep :: Data.Map.Map Int [Int] -> Int
+mostMinutesAsleep :: Map Int [Int] -> Int
 mostMinutesAsleep observationMap =
   let compareEntry (_, arr1) (_, arr2) = compare (length arr1) (length arr2)
       (heavySleeper, _) = maximumBy compareEntry (toList observationMap)
@@ -57,9 +60,8 @@ mostFrequentMinuteAsleep minutesAsleep =
       mostFrequent = maximumBy (comparing snd) >>> fst $ asleepList
   in mostFrequent
 
--- From a list of Observation, return a list of tuple of guardId to minutes
--- slept
-guardIdToMinuteArray :: [Observation] -> Data.Map.Map Int [Int]
+-- From a list of Observation, return a map of guardId to minutes slept
+guardIdToMinuteArray :: [Observation] -> Map Int [Int]
 guardIdToMinuteArray observations =
   let allObservations = processObservations observations (State 0 0) []
   in fromListWith (++) (sort allObservations)
@@ -108,4 +110,27 @@ parseMinute timestamp =
   in read minute :: Int
 
 part2 :: [Observation] -> Int
-part2 observations = -2
+part2 observations =
+  let observationMap = guardIdToMinuteArray (sort observations)
+      mostFrequentSleepMinute =
+        minuteTotals >>> mostFrequentMinuteEntry $ observationMap
+      (guard, minuteList) = mostFrequentSleepMinute
+      (minute, _) = maximumBy (comparing snd) minuteList
+  in guard * minute
+
+-- From a map of guardId to minutes slept, return a map of guardId to array of
+-- tuples of (minute, frequency).  There will be 60 elements in the array.
+-- TODO do we really need a tuple, or would it suffice to use the list index as
+-- the minute?
+minuteTotals :: Map Int [Int] -> Map Int [(Int, Int)]
+minuteTotals observationMap =
+  let minuteCount v = [(m, occurrences (==m) v) | m <- [0..59]]
+  in M.map minuteCount observationMap
+
+-- From a map of guardId to array of tuples of (minute, frequency), return the
+-- element with the highest number of minutes
+mostFrequentMinuteEntry :: Map Int [(Int, Int)] -> (Int, [(Int, Int)])
+mostFrequentMinuteEntry minuteTotals =
+  let greatest minuteList = snd (maximumBy (comparing snd) minuteList)
+      compareEntry (_, arr1) (_, arr2) = compare (greatest arr1) (greatest arr2)
+  in maximumBy compareEntry (toList minuteTotals)
