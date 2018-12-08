@@ -31,7 +31,7 @@ data Claim = Claim { claimId :: Int
 part1 :: [Claim] -> Int
 part1 claims =
   let coordMap = frequencyMap (concatMap coveredCoords claims)
-      overlaps = occurrences (\l -> snd l > 1) (toList coordMap)
+      overlaps = occurrences (\(_, c) -> c > 1) (toList coordMap)
   in overlaps
 
 parseClaim :: String -> Claim
@@ -59,10 +59,13 @@ frequencyMap l =
 part2 :: [Claim] -> Int
 part2 claims =
   let allCoveredCoords = map (\c -> (claimId c, coveredCoords c)) claims
-      allCoordinatesAndClaims = concatMap (\p ->  map (\c -> (c, [fst p])) (snd p)) allCoveredCoords
-      coordToClaimIdList = fromListWith (++) allCoordinatesAndClaims
-      allHaveOneClaim entry = all(\coord -> hasOneClaim coordToClaimIdList coord) (snd entry)
-      result = find (\x -> allHaveOneClaim x) allCoveredCoords
+      allCoordinatesAndClaims =
+        concatMap (\(cid, coords) ->
+          map (\coord -> (coord, [cid])) coords
+        ) allCoveredCoords
+      coordToClaimIdMap = fromListWith (++) allCoordinatesAndClaims
+      allHaveOneClaim (_, coords) = all(hasOneClaim coordToClaimIdMap) coords
+      result = find allHaveOneClaim allCoveredCoords
   in fst (fromJust result)
 
 -- True if a coordinate exists in the map and has 1 claim; False if it does not
@@ -70,4 +73,4 @@ part2 claims =
 hasOneClaim :: Data.Map.Map Coord [Int] -> Coord -> Bool
 hasOneClaim coordToClaimIds coord =
   let maybeClaimList = Data.Map.lookup coord coordToClaimIds
-  in maybe False id (fmap (\v -> length v == 1) maybeClaimList)
+  in maybe False id (fmap ((1==).length) maybeClaimList)
