@@ -3,7 +3,6 @@ module AC.Dec02(part1, part2, analyzeId, dropNth, variations, similar) where
 import System.Environment
 import Helpers
 import Data.List
-import qualified Data.Set as Set
 
 main = do
     [problem, filename] <- getArgs

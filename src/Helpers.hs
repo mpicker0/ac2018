@@ -1,4 +1,4 @@
-module Helpers(intsFromFile, stringsFromFile, occurrences) where
+module Helpers(intsFromFile, stringsFromFile, thingsFromFile, occurrences) where
 
 -- TODO generalize to Num?
 intsFromFile :: String -> IO [Int]
@@ -12,6 +12,14 @@ stringsFromFile :: String -> IO [String]
 stringsFromFile filename = do
   l <- readFile filename
   return (lines l)
+
+-- Generic function to read "things" from a file and return a list.  A converter
+-- function is supplied that can convert from a String to the thing desired.
+thingsFromFile :: String -> (String -> a) -> IO [a]
+thingsFromFile filename converter = do
+  l <- readFile filename
+  let fileLines = lines l
+  return (map converter fileLines)
 
 -- Count the number of times a predicate in a list is satisfied
 -- This composes together the length and filter function; we basically filter

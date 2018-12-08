@@ -26,6 +26,13 @@ If this is the first time starting this image, install
 cabal update && cabal install hspec
 ```    
 
+Also, install the regular expression library since some of the solutions use
+that:
+
+```bash
+cabal install regex-posix
+```
+
 # Running
 ## Running the tests
 
@@ -46,12 +53,24 @@ scripts/tests.sh -m AC.Dec01
 scripts/tests.sh -m "AC.Dec01/part2/finds the result for example 2"
 ```
 
-Leave out individual
-
 ## Running the exercises
 
 Run the exercise for a particular day with
 
 ```bash
 scripts/dec01.sh
+```
+
+# GHCi cheat sheet
+Start ghci with a reference to the source directory so that scripts (and their
+dependencies) can be loaded:
+
+```bash
+ghci -isrc
+```
+
+Load a source file into ghci
+
+```
+:load src/AC/Dec03.hs
 ```
