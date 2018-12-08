@@ -3,7 +3,7 @@ module Playground.Maps (frequencyMap, groupByListOfTuple, myGroupBy) where
 import qualified Data.Map
 import Data.Function (on)
 import Data.Ord (comparing)
-import Data.List (groupBy, sortBy)  --groupBy
+import Data.List (groupBy, sortBy)
 import Control.Arrow
 
 frequencyMap :: (Ord a) => [a] -> Data.Map.Map a Int

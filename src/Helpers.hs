@@ -1,4 +1,12 @@
-module Helpers(intsFromFile, stringsFromFile, thingsFromFile, occurrences) where
+module Helpers
+  ( intsFromFile
+  , stringsFromFile
+  , thingsFromFile
+  , occurrences
+  , frequencyMap
+  ) where
+
+import Data.Map (Map, empty, insertWith)
 
 -- TODO generalize to Num?
 intsFromFile :: String -> IO [Int]
@@ -27,3 +35,8 @@ thingsFromFile filename converter = do
 -- length(filter(pred list))
 occurrences :: (a -> Bool) -> [a] -> Int
 occurrences pred = length . filter pred
+
+-- Given a list where items may be duplicated, return a Map where the key is an
+-- individual item in the list and the value is the number of times it occurs
+frequencyMap :: (Ord a) => [a] -> Data.Map.Map a Int
+frequencyMap = foldl (\acc x -> Data.Map.insertWith (+) x 1 acc) empty

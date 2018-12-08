@@ -51,11 +51,6 @@ coveredCoords c =
   in [ Coord {x = x, y = y} | x <- [(x.coord) c..rightBound],
                               y <- [(y.coord) c..lowerBound] ]
 
--- This may be worth factoring out into Helpers
-frequencyMap :: (Ord a) => [a] -> Data.Map.Map a Int
-frequencyMap l =
-  foldl (\acc x -> Data.Map.insertWith (+) x 1 acc) Data.Map.empty l
-
 part2 :: [Claim] -> Int
 part2 claims =
   let allCoveredCoords = map (\c -> (claimId c, coveredCoords c)) claims
