@@ -9,7 +9,7 @@ spec = do
   describe "intsFromFile" $ do
     it "reads a list of Ints from a file" $ do
       ints <- intsFromFile "test/data/numbers.txt"
-      ints `shouldBe` [1, 2, 3, 4]
+      ints `shouldBe` [1, -2, 3, -4]
 
   describe "occurrences" $ do
     it "counts the number of items in a list that satisfy a predicate" $ do
