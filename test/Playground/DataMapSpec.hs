@@ -2,6 +2,7 @@ module Playground.DataMapSpec (spec) where
 
 import Test.Hspec
 import Data.Map
+import Data.List
 import Playground.Maps
 
 spec :: Spec
@@ -48,8 +49,13 @@ spec = do
           expectedResult = fromList [(3, "ab"), (5, "aba")]
       fromListWith fn input `shouldBe` expectedResult
 
-    -- it "handles collisions between keys using a different function" $ do
-    --   let fn = (++)
-    --       input = [(5, "a"), (5, "b"), (3, "b"), (3, "a"), (5, "a")]
-    --       expectedResult = fromList [(3, ["a", "b"]), (5, ["a", "b", "a"])]
-    --   fnomListWith fn (input) `shouldBe` expectedResult
+  describe "map" $ do
+    it "maps a function over the values in a map" $ do
+      let input = fromList [("a", 1), ("b", 2), ("c", 3)]
+          expectedResult = fromList [("a", 2), ("b", 3), ("c", 4)]
+      Data.Map.map (+1) input `shouldBe` expectedResult
+
+    it "maps a more complex function over the values in a map" $ do
+      let input = fromList [("a", [1, 2, 3]), ("b", [2]), ("c", [3, 4])]
+          expectedResult = fromList [("a", [1, 3]), ("b", []), ("c", [3, 4])]
+      Data.Map.map (Data.List.delete 2) input `shouldBe` expectedResult
