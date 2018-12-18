@@ -69,8 +69,18 @@ dependencies) can be loaded:
 ghci -isrc
 ```
 
-Load a source file into ghci
+* Load a source file into ghci
 
 ```
 :load src/AC/Dec03.hs
+```
+
+* Multiline input
+
+```
+:{
+
+[paste input here]
+
+:}
 ```
