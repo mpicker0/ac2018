@@ -163,3 +163,10 @@ spec = do
           let state1 = [1, 0, 0, 0]
               state2 = [1, 0, 0, 0]
           runInstruction (Instruction Eqrr 0 1 3) state1 `shouldBe` state2
+
+  -- I ran this iteratively just to get the output.  It's not a real test.
+  -- describe "figureOutOpcodes" $ do
+  --   it "figures out the opcodes" $ do
+  --     sampleInput <- stringsFromFile "data/dec16_input_1.txt"
+  --     let samples = parseSamples sampleInput
+  --     figureOutOpcodes samples `shouldBe` ""

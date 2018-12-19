@@ -9,6 +9,7 @@ module AC.Dec16 (
   , Opcode (..)
   , Instruction (..)
   , RawInstruction
+  , figureOutOpcodes
   , part2
   ) where
 
@@ -17,17 +18,20 @@ import Helpers
 import Control.Arrow
 import Data.List
 import Data.Bits
+import qualified Data.Map as M
 import Text.Regex.Posix hiding (before, after)
 
 main = do
     [problem, filename1, filename2] <- getArgs
     sampleInput <- stringsFromFile filename1
     let samples = parseSamples sampleInput
-    instructions <- thingsFromFile filename2 parseRawInstruction
+    rawInstructions <- thingsFromFile filename2 parseRawInstruction
     putStrLn (case problem of
                "1" -> show (part1 samples)
-               "2" -> show (part2 instructions))
+               "2" -> show (part2 rawInstructions))
 
+-- A RawInstruction is an instruction for which we do not (initially) know the
+-- Opcode for, just the number.
 type RawInstruction = [Int]
 type Registers = [Int]
 
@@ -52,7 +56,28 @@ data Instruction =
               , a :: Int
               , b :: Int
               , c :: Int
-              }
+              } deriving (Show)
+
+-- Hack?  Built this by hand by running figureOutOpcodes iteratively until
+-- all opcodes were known.
+instructionMap = M.fromList [
+                   (9, Gtrr)
+                 , (3, Eqir)
+                 , (11, Gtri)
+                 , (12, Eqri)
+                 , (1, Eqrr)
+                 , (8, Gtir)
+                 , (0, Banr)
+                 , (2, Setr)
+                 , (6, Bani)
+                 , (15, Seti)
+                 , (14, Mulr)
+                 , (5, Muli)
+                 , (10, Addi)
+                 , (13, Addr)
+                 , (7, Borr)
+                 , (4, Bori)
+                 ]
 
 part1 :: [Sample] -> Int
 part1 samples =
@@ -61,6 +86,26 @@ part1 samples =
         occurrences (==True) $ allOpcodes
       matchArray = map countMatches samples
   in occurrences (>= 3) matchArray
+
+-- Hack to determine the opcodes from the samples.  Finds all samples for which
+-- only one opcode is possible and outputs the instruction/opcode.  By adding
+-- these newly-determined mappings to instructionMap above, then rerunning, we
+-- can iteratively determine all the opcode mappings.
+--
+-- This could definitely be automated, but... time...
+figureOutOpcodes samples =
+  let allOpcodes = [minBound .. maxBound] :: [Opcode]
+      -- We only care about opcodes we haven't already identified
+      isUnknown oc =
+        M.filter (==oc) >>> M.null $ instructionMap
+      -- Get a list of all unknown opcodes that work for this sample
+      matching sample =
+        let rawInstruction = head (instruction sample)
+        in map (\oc -> ((oc, rawInstruction), sampleWorksForOpcode sample oc))
+          >>> filter (\((oc,_),res) -> res == True && isUnknown oc)
+          >>> map (\((oc, num), _) -> (num, oc)) $ allOpcodes
+      result = nub(filter (\x -> length x == 1) (map matching samples))
+  in show(result)
 
 -- Determine if a given sample holds true for a particular opcode; that is, if
 -- the after state of the sample is consistent with executing the opcode against
@@ -132,4 +177,9 @@ parseRawInstruction :: String -> RawInstruction
 parseRawInstruction = words >>> map(\w -> read w :: Int)
 
 part2 :: [RawInstruction] -> Int
-part2 instructions = -2
+part2 rawInstructions =
+  let instructions = map (\(oc:a:b:c:_) ->
+        Instruction (instructionMap M.! oc) a b c) rawInstructions
+      finalState =
+        foldl' (\regs i -> runInstruction i regs) [0, 0, 0, 0] instructions
+  in head finalState
