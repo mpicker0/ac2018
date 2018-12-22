@@ -60,7 +60,7 @@ spec = do
       buildNodeRec license `shouldBe` (nodeA, [])
 
   describe "totalMetadata" $ do
-    it "totals the metadata of am enpty node" $ do
+    it "totals the metadata of am empty node" $ do
       totalMetadata emptyNode `shouldBe` 0
 
     it "totals the metadata of a single node" $ do
@@ -68,3 +68,14 @@ spec = do
 
     it "totals the metadata in the example" $ do
       totalMetadata nodeA `shouldBe` 138
+
+  describe "totalValue" $ do
+    it "totals the value of a node with no children" $ do
+      totalValue nodeB `shouldBe` 33
+      totalValue nodeD `shouldBe` 99
+
+    it "totals the value of a node with a nonexistent child reference" $ do
+      totalValue nodeC `shouldBe` 0
+
+    it "totals the value of a node with child references" $ do
+      totalValue nodeA `shouldBe` 66

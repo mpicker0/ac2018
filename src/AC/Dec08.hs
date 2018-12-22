@@ -4,11 +4,13 @@ module AC.Dec08 (
   , buildNodeRec
   , buildChildren
   , totalMetadata
+  , totalValue
   , part2
   ) where
 
 import System.Environment
 import Helpers
+import Control.Arrow
 import Data.List
 
 main = do
@@ -49,10 +51,24 @@ totalMetadata :: Node -> Int
 totalMetadata node =
   sum (metadata node) + sum (map totalMetadata (children node))
 
+-- Total the value of a node and all its children
+totalValue :: Node -> Int
+totalValue n@(Node [] _) = totalMetadata n  -- no children: total the metadata
+totalValue (Node c m) =
+  let numChildren = length c
+      -- convert to 0-based indexing and drop nonexistent child references
+      validChildIdx = map (subtract 1)
+                      >>> filter (\i -> i >= 0 && i < numChildren)
+                      $ m
+      validChildren = [ c !! i | i <- validChildIdx ]
+  in sum (map totalValue validChildren)
+
 part1 :: License -> Int
 part1 license =
   let root = buildNode license
   in totalMetadata root
 
 part2 :: License -> Int
-part2 license = -2
+part2 license =
+  let root = buildNode license
+  in totalValue root
