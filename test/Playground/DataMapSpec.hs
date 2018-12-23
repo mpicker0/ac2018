@@ -4,9 +4,28 @@ import Test.Hspec
 import Data.Map
 import Data.List
 import Playground.Maps
+import Control.Exception (evaluate)
 
 spec :: Spec
 spec = do
+  describe "looking up items" $ do
+    let testMap = fromList [(1, "one"), (2, "two")]
+
+    it "lets me look up an item using lookup" $ do
+      Data.Map.lookup 1 testMap `shouldBe` Just("one")
+      Data.Map.lookup 3 testMap `shouldBe` Nothing
+
+    it "lets me look up an item using !?" $ do
+      -- infix syntax for lookup
+      testMap !? 1 `shouldBe` Just("one")
+      testMap !? 3 `shouldBe` Nothing
+
+    it "lets me look up an item using !" $ do
+      -- this returns the actual item, rather than Maybe; it throws an error if
+      -- the item is not found
+      testMap ! 1 `shouldBe` "one"
+      evaluate (testMap ! 3) `shouldThrow` anyException
+
   -- Examples from http://hackage.haskell.org/package/containers-0.6.0.1/docs/Data-Map-Strict.html#v:insertWith
   -- This is all from Data.Map
   describe "insertWith" $ do

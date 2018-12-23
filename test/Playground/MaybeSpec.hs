@@ -1,7 +1,7 @@
 module Playground.MaybeSpec (spec) where
 
 import Test.Hspec
-import Data.Maybe (fromJust)
+import Data.Maybe (fromJust, catMaybes)
 import Control.Exception (evaluate)
 
 spec :: Spec
@@ -14,6 +14,10 @@ spec = do
     it "lets me fmap a function to Nothing" $ do
       let maybeInt = Nothing :: Maybe Int
       fmap (+1) maybeInt `shouldBe` Nothing
+
+    it "lets me use <$>, the infix alias for fmap" $ do
+      let maybeInt = Just 3 :: Maybe Int
+      (+1) <$> maybeInt `shouldBe` Just 4
 
   describe "maybe" $ do
     it "keeps the existing value" $ do
@@ -35,3 +39,14 @@ spec = do
     it "throws an exception if it does not exist" $ do
       let maybeInt = Nothing :: Maybe Int
       evaluate (fromJust maybeInt) `shouldThrow` anyException
+
+  describe "mapping over a list" $ do
+    it "maps a function over a list of Maybe" $ do
+      let maybeList = [Nothing, Just 3, Nothing, Nothing, Just 4]
+          newList = fmap (+1) <$> maybeList
+      newList `shouldBe` [Nothing, Just 4, Nothing, Nothing, Just 5]
+
+  describe "catMaybes" $ do
+    it "removes the Nothing values from a list" $ do
+      let maybeList = [Nothing, Just 3, Nothing, Nothing, Just 4]
+      catMaybes maybeList `shouldBe` [3, 4]
