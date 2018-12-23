@@ -36,7 +36,9 @@ part1 rows =
 part1Debug :: [String] -> String
 part1Debug rows =
   let coordMap = createCoordMap rows
-  in renderArea (iterate newState coordMap !! 10)
+      runTimes n = iterate newState coordMap !! n
+      renderings = [ (show n) ++ "\n" ++ renderArea (runTimes n) | n <- [0..50] ]
+  in intercalate "\n\n" renderings
 
 data Coord = Coord { x :: Int
                    , y :: Int} deriving (Eq, Show, Ord)
@@ -109,4 +111,18 @@ newState :: AreaMap -> AreaMap
 newState areaMap = M.mapWithKey (\k _ -> acreNewState areaMap k) areaMap
 
 part2 :: [String] -> Int
-part2 rows = -2
+part2 rows =
+  let coordMap = createCoordMap rows
+      (cycleStart, cycleLength, history) = findCycle coordMap []
+      timeBillion = ((1000000000 - cycleStart) `mod` cycleLength) + cycleStart
+      area = history !! timeBillion
+      count acreType = occurrences (==acreType) (M.elems area)
+  in count Wooded * count Lumberyard
+
+-- Run until a cycle is encountered, then return the cycle length, offset of the
+-- cycle start, and all area values until the cycle was detected
+findCycle :: AreaMap -> [AreaMap] -> (Int, Int, [AreaMap])
+findCycle areaMap history =
+  case findIndex (==areaMap) history of
+    Just firstOcc -> (firstOcc, ((length history) - firstOcc), history)
+    otherwise -> findCycle (newState areaMap) (history ++ [areaMap])
