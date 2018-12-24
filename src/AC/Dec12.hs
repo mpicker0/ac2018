@@ -13,7 +13,6 @@ import Data.List
 import qualified Data.Map as M
 import Data.Maybe (fromJust)
 import Text.Regex.Posix
-import Debug.Trace
 
 main = do
     [problem, filename] <- getArgs

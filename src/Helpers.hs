@@ -4,9 +4,11 @@ module Helpers
   , thingsFromFile
   , occurrences
   , frequencyMap
+  , toIntMap
   ) where
 
 import Data.Map (Map, empty, insertWith)
+import qualified Data.IntMap as IM
 
 -- TODO generalize to Num?
 intsFromFile :: String -> IO [Int]
@@ -40,3 +42,6 @@ occurrences pred = length . filter pred
 -- individual item in the list and the value is the number of times it occurs
 frequencyMap :: (Ord a) => [a] -> Data.Map.Map a Int
 frequencyMap = foldl (\acc x -> Data.Map.insertWith (+) x 1 acc) empty
+
+toIntMap :: [a] -> IM.IntMap a
+toIntMap xs = IM.fromList (zip [0..] xs)
