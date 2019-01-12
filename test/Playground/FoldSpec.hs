@@ -38,3 +38,21 @@ spec = do
           result =
             iterate (\(out, (a:b:t)) -> (out ++ [a + b], t)) initial !! outlen
       result `shouldBe` ([3, 7, 11], [])
+
+  describe "scanl" $ do
+    it "lets me turn a list of numbers into successive lists of strings" $ do
+      -- see the first example under foldl above
+      let input = [1, 2, 3, 4]
+      -- the difference between foldl and scanl, is that scanl returns all the
+      -- intermediate results
+      let expectedOutput = ["", "1", "12", "123", "1234"]
+      scanl (\acc x -> acc ++ show x) "" input `shouldBe` expectedOutput
+
+  describe "until" $ do
+    it "applies a function until a predicate is met" $ do
+      -- similar to iterate, but there is a predicate that tells when to stop
+      -- Syntax:  until <stop predicate> <fn> <initial>
+      -- See iterate above
+      until (\x -> length x == 4) (\x -> "*" ++ x) "" `shouldBe` "****"
+      -- or more concisely
+      until (\x -> length x == 4) (++"*") "" `shouldBe` "****"
