@@ -9,9 +9,9 @@ module AC.Dec11 (
 
 import System.Environment
 import Helpers
-import qualified Data.Map as M
 import Data.List (maximumBy)
 import Data.Ord (comparing)
+import Data.Array
 
 main = do
     [problem, filename] <- getArgs
@@ -42,17 +42,18 @@ determinePower (Coord x y) serialNumber =
 -- squares in the grid.  Returns a tuple of (power level, upper-left coordinate)
 maxPower :: Int -> (Int, Coord)
 maxPower serial =
-  let grid = M.fromList [ (Coord x y, determinePower (Coord x y) serial)
-                          | x <- [1..gridSize],
-                            y <- [1..gridSize]
-                        ]
+  let grid = array ((1,1), (gridSize,gridSize))
+                   [ ((x, y), determinePower (Coord x y) serial)
+                     | x <- [1..gridSize]
+                     , y <- [1..gridSize]
+                   ]
       -- return a 3x3 square with the upper-left at x, y
       squareFrom (Coord x y) = [(Coord x y) | x <- [x..x + 2], y <- [y..y + 2]]
       -- determine the total power of cells
-      squarePower cells = sum [ grid M.! c | c <- cells ]
+      squarePower cells = sum [ grid ! (x, y) | (Coord x y) <- cells ]
       allSquaresWithPower = [ (squarePower(squareFrom (Coord x y)), (Coord x y))
-                              | x <- [1..gridSize-2],
-                                y <- [1..gridSize-2]
+                              | x <- [1..gridSize-2]
+                              , y <- [1..gridSize-2]
                             ]
   in maximumBy (comparing fst) allSquaresWithPower
 
@@ -65,21 +66,22 @@ part2 serialNumber =
 -- find a way to avoid summing up squares multiple times.
 maxPower2 :: Int -> (Int, Coord, Int)
 maxPower2 serial =
-  let grid = M.fromList [ (Coord x y, determinePower (Coord x y) serial)
-                          | x <- [1..gridSize],
-                            y <- [1..gridSize]
-                        ]
+  let grid = array ((1,1), (gridSize,gridSize))
+                   [ ((x, y), determinePower (Coord x y) serial)
+                     | x <- [1..gridSize]
+                     , y <- [1..gridSize]
+                   ]
       -- return an nxn square with the upper-left at x, y
       squareFrom (Coord x y) n = [ (Coord x y)
-                                   | x <- [x..x + n-1],
-                                     y <- [y..y + n-1]
+                                   | x <- [x..x + n-1]
+                                   , y <- [y..y + n-1]
                                  ]
       -- determine the total power of cells
-      squarePower cells = sum [ grid M.! c | c <- cells ]
+      squarePower cells = sum [ grid ! (x, y) | (Coord x y) <- cells ]
       allSquaresWithPower n =
         [ (squarePower(squareFrom (Coord x y) n), (Coord x y))
-          | x <- [1..gridSize-n+1],
-            y <- [1..gridSize-n+1]
+          | x <- [1..gridSize-n+1]
+          , y <- [1..gridSize-n+1]
         ]
       -- maximum for a given square size
       maxSquareWithPower n =
