@@ -5,6 +5,8 @@ module AC.Dec14 (
   , getNewState
   , tenAfter
   , part2
+  , lastn
+  , leftOf
   ) where
 
 import System.Environment
@@ -19,7 +21,7 @@ main = do
     let recipeCount = read (head fileContents) :: Int
     putStrLn (case problem of
                "1" -> part1 recipeCount
-               "2" -> part2 recipeCount)
+               "2" -> show(part2 recipeCount))
 
 type Scoreboard = IntMap Int
 
@@ -64,5 +66,27 @@ tenAfter n state =
 part1 :: Int -> String
 part1 recipeCount = tenAfter recipeCount initialState
 
-part2 :: Int -> String
-part2 recipeCount = "-2"
+-- Return a string which is the last n scores from the scoreboard.  Arguments:
+-- number of scores, state.
+lastn :: Int -> State -> String
+lastn n (State _ _ scoreboard nextIdx) =
+  if n > nextIdx then ""
+  else concatMap show [ scoreboard ! n | n <- [nextIdx - n..nextIdx - 1] ]
+
+-- Return the number of scores to the left of the given string.  Arguments:
+-- string to search for, state.
+leftOf :: String -> State -> Int
+leftOf string state =
+  let scoreLen = length string
+      lastState = until (\state -> lastn scoreLen state == string)
+                        (\st -> getNewState st) state
+      -- TODO should probably use this form, in case the last iteration
+      -- generated two recipes
+      --lastState = until (\state -> isInfixOf string (lastn scoreLen+1 state)) (\st -> getNewState st) state
+  in (nextIdx lastState) - scoreLen
+
+-- Runs out of memory somewhere between 20M and 25M :(
+part2 :: Int -> Int
+part2 recipeCount =
+  let recipeStr = show recipeCount
+  in leftOf recipeStr initialState

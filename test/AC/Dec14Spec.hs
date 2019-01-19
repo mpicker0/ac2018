@@ -8,7 +8,7 @@ import Data.IntMap (fromList)
 spec :: Spec
 spec = do
   describe "part1" $ do
-    it "solves the example (2018)" $ do      
+    it "solves the example (2018)" $ do
       fileContents <- stringsFromFile "test/data/dec14_input.txt"
       let recipeCount = read (head fileContents) :: Int
       part1 recipeCount `shouldBe` "5941429882"
@@ -41,3 +41,21 @@ spec = do
 
     it "gets the ten recipes after making 2018" $ do
       tenAfter 2018 initialState `shouldBe` "5941429882"
+
+  describe "lastn" $ do
+    it "gets the last 5 numbers in the scoreboard" $ do
+      let state = State 0 6 (toIntMap [3, 7, 1, 0, 1, 0, 1, 2]) 8
+      lastn 5 state `shouldBe` "01012"
+
+  describe "leftOf" $ do
+    it "solves the first example" $ do
+      leftOf "51589" initialState `shouldBe` 9
+
+    it "solves the second example" $ do
+      leftOf "01245" initialState `shouldBe` 5
+
+    it "solves the third example" $ do
+      leftOf "92510" initialState `shouldBe` 18
+
+    it "solves the fourth example" $ do
+      leftOf "59414" initialState `shouldBe` 2018 

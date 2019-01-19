@@ -43,5 +43,7 @@ occurrences pred = length . filter pred
 frequencyMap :: (Ord a) => [a] -> Data.Map.Map a Int
 frequencyMap = foldl (\acc x -> Data.Map.insertWith (+) x 1 acc) empty
 
+-- Convert an array to an IntMap.  Argument:  an array (ex. [1, 2, 3]); result:
+-- an IntMap with element 0 corresponding to the first array element, etc.
 toIntMap :: [a] -> IM.IntMap a
 toIntMap xs = IM.fromList (zip [0..] xs)
