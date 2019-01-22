@@ -78,14 +78,15 @@ lastn n (State _ _ scoreboard nextIdx) =
 leftOf :: String -> State -> Int
 leftOf string state =
   let scoreLen = length string
-      lastState = until (\state -> lastn scoreLen state == string)
-                        (\st -> getNewState st) state
-      -- TODO should probably use this form, in case the last iteration
-      -- generated two recipes
-      --lastState = until (\state -> isInfixOf string (lastn scoreLen+1 state)) (\st -> getNewState st) state
-  in (nextIdx lastState) - scoreLen
+      -- go one iteration beyond what they asked for
+      lastState = until (\st -> isInfixOf string (lastn (scoreLen + 1) st))
+                        getNewState state
+      -- handle case where last iteration produced an extra recipe
+      goBack = if lastn scoreLen lastState == string then 0 else 1
+  in (nextIdx lastState) - scoreLen - goBack
 
--- Runs out of memory somewhere between 20M and 25M :(
+-- Even on "reasonably" sized machines, runs out of memory somewhere between
+-- 20M and 25M iterations :(
 part2 :: Int -> Int
 part2 recipeCount =
   let recipeStr = show recipeCount

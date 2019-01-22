@@ -58,4 +58,12 @@ spec = do
       leftOf "92510" initialState `shouldBe` 18
 
     it "solves the fourth example" $ do
-      leftOf "59414" initialState `shouldBe` 2018 
+      leftOf "59414" initialState `shouldBe` 2018
+
+    it "works if the last iteration produced one recipe" $ do
+      leftOf "1245158916" initialState `shouldBe` 6
+
+    it "works if the last iteration produced two recipes" $ do
+      -- the scoreboard will still be 3710101245158916 in this case
+      --                     searching for 0124515891
+      leftOf "0124515891" initialState `shouldBe` 5
